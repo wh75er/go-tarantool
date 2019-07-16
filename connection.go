@@ -495,6 +495,9 @@ func (conn *Connection) writer() (err error) {
 		return err
 	}
 
+	var flushChan, flushChanAlways chan bool = nil, make(chan bool)
+	close(flushChanAlways)
+
 WRITER_LOOP:
 	for {
 		select {
@@ -505,25 +508,14 @@ WRITER_LOOP:
 			if err = wr(w, req); err != nil {
 				break WRITER_LOOP
 			}
+			flushChan = flushChanAlways
 		case <-stopChan:
 			break WRITER_LOOP
-		default:
+		case <-flushChan:
 			if err = w.Flush(); err != nil {
 				break WRITER_LOOP
 			}
-
-			// same without flush
-			select {
-			case req, ok := <-writeChan:
-				if !ok {
-					break WRITER_LOOP
-				}
-				if err = wr(w, req); err != nil {
-					break WRITER_LOOP
-				}
-			case <-stopChan:
-				break WRITER_LOOP
-			}
+			flushChan = nil
 		}
 	}
 
