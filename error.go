@@ -47,7 +47,7 @@ func NewConnectionError(con *Connection, err error) *ConnectionError {
 // or error depending on the connection state. It is also has remoteAddr in error text.
 func ConnectionClosedError(con *Connection) *ConnectionError {
 	var err = ErrConnectionClosed
-	if connErr := con.getError(); err != nil {
+	if connErr := con.getError(); connErr != nil {
 		err = fmt.Errorf("Connection error: %v", connErr.Error())
 	}
 	return NewConnectionError(con, err)
