@@ -55,6 +55,10 @@ func ConnectionClosedError(con *Connection) *ConnectionError {
 
 // Temporary implements Error interface.
 func (e *ConnectionError) Temporary() bool {
+	if errors.Is(e.error, ErrConnectionClosed) {
+		return false
+	}
+
 	return true
 }
 
