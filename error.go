@@ -48,7 +48,7 @@ func NewConnectionError(con *Connection, err error) *ConnectionError {
 func ConnectionClosedError(con *Connection) *ConnectionError {
 	var err = ErrConnectionClosed
 	if connErr := con.getError(); connErr != nil {
-		err = fmt.Errorf("Connection error: %v", connErr.Error())
+		err = fmt.Errorf("%w: Connection error: %v", err, connErr.Error())
 	}
 	return NewConnectionError(con, err)
 }
